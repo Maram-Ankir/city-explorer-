@@ -14,13 +14,13 @@ export class App extends Component {
       cityName: '',
       cityData: {},
       displayData: false,
-      errorMsg:''
+      errorMsg: ''
     }
   };
 
   updatCityName = (e) => {
     // console.log(e.target.value);
-    // updating the state 
+
     this.setState({
       cityName: e.target.value
     });
@@ -28,23 +28,23 @@ export class App extends Component {
   }
 
   getCityData = async (e) => {
-    try{
+    try {
       e.preventDefault();
       const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`);
-  
-  
+
+
       console.log(axiosResponse);
       this.setState({
         cityData: axiosResponse.data[0],
         displayData: true,
-        errorMsg:''
+        errorMsg: ''
       })
     }
-    catch(error){
-    this.setState({
-      errorMsg:error.message,
-      displayData: false,
-    })
+    catch (error) {
+      this.setState({
+        errorMsg: error.message,
+        displayData: false,
+      })
       // console.log(error.message)
     }
 
@@ -52,29 +52,28 @@ export class App extends Component {
 
 
   render() {
-    const {errorMsg ,displayData} = this.state 
+    const { errorMsg, displayData } = this.state
     return (
       <div class="container">
         <h2>City Explorer</h2>
-     
-        <Form onSubmit={this.getCityData}>
-  <Form.Group className="mb-2" controlId="formBasiCities">
-    <Form.Label>City Name </Form.Label>
-    <Form.Control onChange={this.updatCityName} type="text" placeholder="Enter City Name" />
-  </Form.Group>
 
-  <Button variant="secondary" size="lg" type="submit">
-      Explore !
+        <Form onSubmit={this.getCityData}>
+          <Form.Group className="mb-2" controlId="formBasiCities">
+            <Form.Label>City Name </Form.Label>
+            <Form.Control onChange={this.updatCityName} type="text" placeholder="Enter City Name" />
+          </Form.Group>
+
+          <Button variant="secondary" size="lg" type="submit">
+            Explore !
     </Button>
 
 
- {errorMsg && <Alert key={1} variant={'danger'}>
- {errorMsg}
-  </Alert>} 
+          {errorMsg && <Alert key={1} variant={'danger'}>
+            {errorMsg}
+          </Alert>}
 
-</Form>
-        {/* Conditional Rendering to display the data after the request was made */}
-        {displayData && 
+        </Form>
+        {displayData &&
           <div>
 
             <p>
