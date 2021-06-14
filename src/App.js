@@ -14,7 +14,8 @@ export class App extends Component {
       cityName: '',
       cityData: {},
       displayData: false,
-      errorMsg: ''
+      errorMsg: '',
+      weatherData: [],
     }
   };
 
@@ -31,11 +32,14 @@ export class App extends Component {
     try {
       e.preventDefault();
       const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`);
-
-
-      console.log(axiosResponse);
+      const cityLoc= axiosResponse.data[0]
+      console.log(process.env.REACT_APP_URL)
+      const myApiRes = await axios.get(`${process.env.REACT_APP_URL}/weather`);
+      console.log(myApiRes)
+      // console.log(axiosResponse);
       this.setState({
         cityData: axiosResponse.data[0],
+        weatherData: myApiRes.data,
         displayData: true,
         errorMsg: ''
       })
@@ -82,6 +86,16 @@ export class App extends Component {
 
             <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.d36871f015649f915282f374cff76628&q&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=15`} alt='' />
 
+
+            {
+              this.state.weatherData.map(value => {
+                return (
+                  <p>
+                    {value.description},date={value.date}
+                  </p>
+                )
+              })
+            }
           </div>
         }
       </div>
