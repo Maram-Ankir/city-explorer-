@@ -16,6 +16,8 @@ export class App extends Component {
       displayData: false,
       errorMsg: '',
       weatherData: [],
+       lat: '',
+      lon: '',
     }
   };
 
@@ -28,22 +30,35 @@ export class App extends Component {
     // console.log(this.state);
   }
 
-  getCityData = async (e) => {
-    try {
-      e.preventDefault();
-      const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`);
-      const cityLoc= axiosResponse.data[0]
-      console.log(process.env.REACT_APP_URL)
-      const myApiRes = await axios.get(`${process.env.REACT_APP_URL}/weather`);
-      console.log(myApiRes)
-      // console.log(axiosResponse);
-      this.setState({
-        cityData: axiosResponse.data[0],
-        weatherData: myApiRes.data,
-        displayData: true,
-        errorMsg: ''
-      })
-    }
+  // getCityData = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     const cityLoc= axiosResponse.data[0]
+      
+
+        getCityData = async (e) => {
+          try{
+          e.preventDefault();
+          await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`).then(locationResponse => {
+      
+            this.setState({
+              cityData: locationResponse.data[0],
+              lat: locationResponse.data[0].lat,
+              lon: locationResponse.data[0].lon,
+            });
+            axios.get(`${process.env.REACT_APP_URL}/weather?lat=${this.state.lat}&lon=${this.state.lon}`).then(weatherResponse => {
+              this.setState({
+                weatherData: weatherResponse.data,
+                displayData: true,
+                errorMsg: ''
+              })
+      
+            });
+          });
+        }
+    
+     
+ 
     catch (error) {
       this.setState({
         errorMsg: error.message,
@@ -90,9 +105,13 @@ export class App extends Component {
             {
               this.state.weatherData.map(value => {
                 return (
+                  <>
                   <p>
-                    {value.description},date={value.date}
+                    {value.description} 
+                     
                   </p>
+                  <p>The date={value.date}</p>
+                  </>
                 )
               })
             }
