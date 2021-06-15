@@ -14,37 +14,56 @@ export class App extends Component {
       cityName: '',
       cityData: {},
       displayData: false,
-      errorMsg:''
+      errorMsg: '',
+      weatherData: [],
+       lat: '',
+      lon: '',
     }
   };
 
   updatCityName = (e) => {
     // console.log(e.target.value);
-    // updating the state 
+
     this.setState({
       cityName: e.target.value
     });
     // console.log(this.state);
   }
 
-  getCityData = async (e) => {
-    try{
-      e.preventDefault();
-      const axiosResponse = await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`);
-  
-  
-      console.log(axiosResponse);
+  // getCityData = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     const cityLoc= axiosResponse.data[0]
+      
+
+        getCityData = async (e) => {
+          try{
+          e.preventDefault();
+          await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`).then(locationResponse => {
+      
+            this.setState({
+              cityData: locationResponse.data[0],
+              lat: locationResponse.data[0].lat,
+              lon: locationResponse.data[0].lon,
+            });
+            axios.get(`${process.env.REACT_APP_URL}/weather?lat=${this.state.lat}&lon=${this.state.lon}`).then(weatherResponse => {
+              this.setState({
+                weatherData: weatherResponse.data,
+                displayData: true,
+                errorMsg: ''
+              })
+      
+            });
+          });
+        }
+    
+     
+ 
+    catch (error) {
       this.setState({
-        cityData: axiosResponse.data[0],
-        displayData: true,
-        errorMsg:''
+        errorMsg: error.message,
+        displayData: false,
       })
-    }
-    catch(error){
-    this.setState({
-      errorMsg:error.message,
-      displayData: false,
-    })
       // console.log(error.message)
     }
 
@@ -52,29 +71,28 @@ export class App extends Component {
 
 
   render() {
-    const {errorMsg ,displayData} = this.state 
+    const { errorMsg, displayData } = this.state
     return (
       <div class="container">
         <h2>City Explorer</h2>
-     
-        <Form onSubmit={this.getCityData}>
-  <Form.Group className="mb-2" controlId="formBasiCities">
-    <Form.Label>City Name </Form.Label>
-    <Form.Control onChange={this.updatCityName} type="text" placeholder="Enter City Name" />
-  </Form.Group>
 
-  <Button variant="secondary" size="lg" type="submit">
-      Explore !
+        <Form onSubmit={this.getCityData}>
+          <Form.Group className="mb-2" controlId="formBasiCities">
+            <Form.Label>City Name </Form.Label>
+            <Form.Control onChange={this.updatCityName} type="text" placeholder="Enter City Name" />
+          </Form.Group>
+
+          <Button variant="secondary" size="lg" type="submit">
+            Explore !
     </Button>
 
 
- {errorMsg && <Alert key={1} variant={'danger'}>
- {errorMsg}
-  </Alert>} 
+          {errorMsg && <Alert key={1} variant={'danger'}>
+            {errorMsg}
+          </Alert>}
 
-</Form>
-        {/* Conditional Rendering to display the data after the request was made */}
-        {displayData && 
+        </Form>
+        {displayData &&
           <div>
 
             <p>
@@ -83,6 +101,20 @@ export class App extends Component {
 
             <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.d36871f015649f915282f374cff76628&q&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=15`} alt='' />
 
+
+            {
+              this.state.weatherData.map(value => {
+                return (
+                  <>
+                  <p>
+                    {value.description} 
+                     
+                  </p>
+                  <p>The date={value.date}</p>
+                  </>
+                )
+              })
+            }
           </div>
         }
       </div>

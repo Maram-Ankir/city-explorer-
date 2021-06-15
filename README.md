@@ -15,7 +15,6 @@ bootstrap-React for styling,
 and Thunder client with axios library for API getting command.
 ## Change Log
 
-
 13-06-2021 9:00pm - Application now has a fully-functional , displaying map of spasific location .
 
 ## Credit and Collaborations
