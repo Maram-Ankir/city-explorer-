@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form'
+import Movie from'./components/Movie'
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert'
 import './App.css';
@@ -16,6 +17,7 @@ export class App extends Component {
       displayData: false,
       errorMsg: '',
       weatherData: [],
+      movieData:[],
        lat: '',
       lon: '',
     }
@@ -39,24 +41,26 @@ export class App extends Component {
         getCityData = async (e) => {
           try{
           e.preventDefault();
-          await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`).then(locationResponse => {
+     const locationResponse= await axios.get(`https://us1.locationiq.com/v1/search.php?key=pk.51a8a7fa9038e75df8dfa5b9d46b1691&q=${this.state.cityName}&format=json`)
       
             this.setState({
               cityData: locationResponse.data[0],
               lat: locationResponse.data[0].lat,
               lon: locationResponse.data[0].lon,
             });
-            axios.get(`${process.env.REACT_APP_URL}/weather?lat=${this.state.lat}&lon=${this.state.lon}`).then(weatherResponse => {
+          const weatherResponse=await axios.get(`${process.env.REACT_APP_URL}/weather?lat=${this.state.lat}&lon=${this.state.lon}`)
               this.setState({
                 weatherData: weatherResponse.data,
                 displayData: true,
                 errorMsg: ''
               })
-      
-            });
-          });
-        }
-    
+
+        
+        const movieResponce= await axios.get(`${process.env.REACT_APP_URL}/movies?cityName=${this.state.cityName}`)
+        this.setState({
+      movieData:movieResponce.data,
+        })
+      }
      
  
     catch (error) {
@@ -117,6 +121,9 @@ export class App extends Component {
             }
           </div>
         }
+       {this.state.movieData.length!==0 &&<Movie
+        movieData={this.state.movieData}
+        />} 
       </div>
     )
   }
